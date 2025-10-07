@@ -1,0 +1,771 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QuantumBlazeGames Studio - Interactive Editor</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+            color: #e0e0ff;
+            min-height: 100vh;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+        
+        .editor-panel, .preview-panel {
+            flex: 1;
+            min-width: 300px;
+            padding: 25px;
+            background: rgba(16, 18, 27, 0.9);
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .preview-panel {
+            position: sticky;
+            top: 20px;
+            height: fit-content;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+        
+        h1 {
+            font-size: 2.2rem;
+            background: linear-gradient(90deg, #6a5af9, #d66efd);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            margin-bottom: 10px;
+            text-shadow: 0 0 20px rgba(106, 90, 249, 0.3);
+            letter-spacing: 1px;
+        }
+        
+        h2 {
+            font-size: 1.5rem;
+            color: #6a5af9;
+            margin: 20px 0 15px;
+            display: flex;
+            align-items: center;
+        }
+        
+        h2 i {
+            margin-right: 10px;
+            font-size: 1.3rem;
+        }
+        
+        .section {
+            margin: 25px 0;
+            padding: 20px;
+            background: rgba(30, 33, 58, 0.6);
+            border-radius: 15px;
+            border-left: 4px solid #6a5af9;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        
+        .section:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.3);
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #a0a0ff;
+            font-weight: 500;
+        }
+        
+        input, textarea {
+            width: 100%;
+            padding: 12px 15px;
+            background: rgba(30, 33, 58, 0.8);
+            border: 1px solid rgba(106, 90, 249, 0.3);
+            border-radius: 8px;
+            color: #e0e0ff;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+        
+        input:focus, textarea:focus {
+            outline: none;
+            border-color: #6a5af9;
+            box-shadow: 0 0 0 2px rgba(106, 90, 249, 0.2);
+        }
+        
+        textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+        
+        .social-inputs {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+        
+        .social-input {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .btn {
+            display: inline-block;
+            padding: 12px 25px;
+            background: linear-gradient(90deg, #6a5af9, #d66efd);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+            margin-top: 10px;
+        }
+        
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(106, 90, 249, 0.4);
+        }
+        
+        .btn-export {
+            background: linear-gradient(90deg, #00b09b, #96c93d);
+            width: 100%;
+            margin-top: 20px;
+        }
+        
+        .btn-reset {
+            background: linear-gradient(90deg, #ff6b6b, #ffa5a5);
+            width: 100%;
+            margin-top: 10px;
+        }
+        
+        .social-links {
+            display: flex;
+            gap: 15px;
+            margin-top: 15px;
+            flex-wrap: wrap;
+        }
+        
+        .social-link {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 15px;
+            background: rgba(106, 90, 249, 0.2);
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            color: #d0d0ff;
+        }
+        
+        .social-link:hover {
+            background: rgba(106, 90, 249, 0.4);
+            transform: translateY(-3px);
+            color: #fff;
+        }
+        
+        .note {
+            margin-top: 20px;
+            padding: 15px;
+            background: rgba(255, 107, 107, 0.1);
+            border-radius: 10px;
+            border-left: 4px solid #ff6b6b;
+            font-style: italic;
+            color: #ffb8b8;
+        }
+        
+        .divider {
+            height: 2px;
+            background: linear-gradient(90deg, transparent, rgba(106, 90, 249, 0.5), transparent);
+            margin: 25px 0;
+        }
+        
+        .game-icon {
+            display: inline-block;
+            margin-right: 10px;
+            font-size: 1.1rem;
+            color: #6a5af9;
+        }
+        
+        .toggle-preview {
+            display: none;
+            background: rgba(30, 33, 58, 0.8);
+            color: #e0e0ff;
+            border: 1px solid #6a5af9;
+            border-radius: 8px;
+            padding: 10px 15px;
+            margin-bottom: 15px;
+            cursor: pointer;
+            width: 100%;
+            font-weight: 600;
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                flex-direction: column;
+            }
+            
+            .toggle-preview {
+                display: block;
+            }
+            
+            .preview-panel {
+                display: none;
+            }
+            
+            .preview-panel.active {
+                display: block;
+            }
+        }
+        
+        .pulse {
+            animation: pulse 3s infinite;
+        }
+        
+        @keyframes pulse {
+            0% {
+                box-shadow: 0 0 0 0 rgba(106, 90, 249, 0.4);
+            }
+            70% {
+                box-shadow: 0 0 0 10px rgba(106, 90, 249, 0);
+            }
+            100% {
+                box-shadow: 0 0 0 0 rgba(106, 90, 249, 0);
+            }
+        }
+        
+        .export-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .export-content {
+            background: rgba(16, 18, 27, 0.95);
+            padding: 30px;
+            border-radius: 15px;
+            width: 90%;
+            max-width: 700px;
+            max-height: 80vh;
+            overflow-y: auto;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+        }
+        
+        .export-content h2 {
+            margin-top: 0;
+        }
+        
+        .export-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        
+        .export-actions .btn {
+            flex: 1;
+        }
+        
+        #exportCode {
+            width: 100%;
+            min-height: 300px;
+            background: #1e1e1e;
+            color: #d4d4d4;
+            font-family: monospace;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+            white-space: pre-wrap;
+            overflow-x: auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <button class="toggle-preview">Toggle Preview</button>
+        
+        <div class="editor-panel">
+            <h1>Profile Editor</h1>
+            <p>Edit your content below and see the live preview update.</p>
+            
+            <div class="form-group">
+                <label for="studioName">Studio Name</label>
+                <input type="text" id="studioName" value="QuantumBlazeGames Studio">
+            </div>
+            
+            <div class="form-group">
+                <label for="tagline">Tagline</label>
+                <input type="text" id="tagline" value="Crafting Next-Generation Gaming Experiences">
+            </div>
+            
+            <div class="form-group">
+                <label for="aboutText">About Me</label>
+                <textarea id="aboutText">Welcome to my itch.io profile! I'm Shiva Kar, also known as QuantumBlaze. I've recently embarked on an exciting journey into game development with Unreal Engine 5. I'm passionate about creating immersive worlds and engaging gameplay experiences. Stay tuned for more awesome games coming in the future! Explore my work and feel free to get in touch.</textarea>
+            </div>
+            
+            <div class="form-group">
+                <label for="email">Email Address</label>
+                <input type="text" id="email" value="shivakaryt@gmail.com">
+            </div>
+            
+            <div class="form-group">
+                <label>Social Media Links</label>
+                <div class="social-inputs">
+                    <div class="social-input">
+                        <label for="twitter">Twitter</label>
+                        <input type="text" id="twitter" value="#">
+                    </div>
+                    <div class="social-input">
+                        <label for="facebook">Facebook</label>
+                        <input type="text" id="facebook" value="#">
+                    </div>
+                    <div class="social-input">
+                        <label for="instagram">Instagram</label>
+                        <input type="text" id="instagram" value="#">
+                    </div>
+                    <div class="social-input">
+                        <label for="itchio">Itch.io</label>
+                        <input type="text" id="itchio" value="https://cosmic-games-studio.itch.io/">
+                    </div>
+                </div>
+            </div>
+            
+            <button class="btn btn-export" id="exportBtn">Export as HTML</button>
+            <button class="btn btn-reset" id="resetBtn">Reset to Default</button>
+        </div>
+        
+        <div class="preview-panel active">
+            <div class="header">
+                <h1 id="previewStudioName">❂ QuantumBlazeGames Studio</h1>
+                <p class="tagline" id="previewTagline">Crafting Next-Generation Gaming Experiences</p>
+            </div>
+            
+            <div class="section pulse">
+                <h2><i class="fas fa-user-astronaut"></i> About Me</h2>
+                <h4 id="previewAboutText">
+                    <span class="game-icon">➤</span> Welcome to my itch.io profile! I'm Shiva Kar, also known as QuantumBlaze. 
+                    I've recently embarked on an exciting journey into game development with Unreal Engine 5. 
+                    I'm passionate about creating immersive worlds and engaging gameplay experiences. 
+                    Stay tuned for more awesome games coming in the future! Explore my work and feel free to get in touch.
+                </h4>
+            </div>
+            
+            <div class="divider"></div>
+            
+            <div class="section">
+                <h2><i class="fas fa-envelope"></i> Contact Me</h2>
+                <h4 id="previewContact">
+                    <span class="game-icon">➤</span> Have questions or want to collaborate? Reach out to me at 
+                    <a href="mailto:shivakaryt@gmail.com" id="previewEmail">shivakaryt@gmail.com</a>.
+                </h4>
+            </div>
+            
+            <div class="section">
+                <h2><i class="fas fa-share-alt"></i> Follow Me</h2>
+                <h4><span class="game-icon">➤</span> Connect with me on social media:</h4>
+                <div class="social-links" id="previewSocialLinks">
+                    <a href="#" class="social-link" id="previewTwitter">
+                        <i class="fab fa-twitter"></i> Twitter
+                    </a>
+                    <a href="#" class="social-link" id="previewFacebook">
+                        <i class="fab fa-facebook"></i> Facebook
+                    </a>
+                    <a href="#" class="social-link" id="previewInstagram">
+                        <i class="fab fa-instagram"></i> Instagram
+                    </a>
+                    <a href="https://cosmic-games-studio.itch.io/" class="social-link" id="previewItchio">
+                        <i class="fab fa-itch-io"></i> itch.io
+                    </a>
+                </div>
+                <div class="note">
+                    <i class="fas fa-exclamation-circle"></i> Note: Social media links are currently placeholders
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="export-modal" id="exportModal">
+        <div class="export-content">
+            <h2>Export Your Profile</h2>
+            <p>Copy the HTML code below and save it as an HTML file to use your customized profile.</p>
+            <textarea id="exportCode" readonly></textarea>
+            <div class="export-actions">
+                <button class="btn" id="copyBtn">Copy to Clipboard</button>
+                <button class="btn btn-reset" id="closeModal">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // DOM Elements
+        const inputs = {
+            studioName: document.getElementById('studioName'),
+            tagline: document.getElementById('tagline'),
+            aboutText: document.getElementById('aboutText'),
+            email: document.getElementById('email'),
+            twitter: document.getElementById('twitter'),
+            facebook: document.getElementById('facebook'),
+            instagram: document.getElementById('instagram'),
+            itchio: document.getElementById('itchio')
+        };
+        
+        const previews = {
+            studioName: document.getElementById('previewStudioName'),
+            tagline: document.getElementById('previewTagline'),
+            aboutText: document.getElementById('previewAboutText'),
+            email: document.getElementById('previewEmail'),
+            contact: document.getElementById('previewContact'),
+            twitter: document.getElementById('previewTwitter'),
+            facebook: document.getElementById('previewFacebook'),
+            instagram: document.getElementById('previewInstagram'),
+            itchio: document.getElementById('previewItchio')
+        };
+        
+        const exportBtn = document.getElementById('exportBtn');
+        const resetBtn = document.getElementById('resetBtn');
+        const exportModal = document.getElementById('exportModal');
+        const exportCode = document.getElementById('exportCode');
+        const copyBtn = document.getElementById('copyBtn');
+        const closeModal = document.getElementById('closeModal');
+        const togglePreview = document.querySelector('.toggle-preview');
+        const previewPanel = document.querySelector('.preview-panel');
+        
+        // Update preview when inputs change
+        Object.keys(inputs).forEach(key => {
+            inputs[key].addEventListener('input', updatePreview);
+        });
+        
+        // Toggle preview on mobile
+        togglePreview.addEventListener('click', () => {
+            previewPanel.classList.toggle('active');
+        });
+        
+        // Export functionality
+        exportBtn.addEventListener('click', generateExportCode);
+        copyBtn.addEventListener('click', copyToClipboard);
+        closeModal.addEventListener('click', () => {
+            exportModal.style.display = 'none';
+        });
+        
+        // Reset functionality
+        resetBtn.addEventListener('click', resetToDefault);
+        
+        // Initialize preview
+        updatePreview();
+        
+        function updatePreview() {
+            // Update text content
+            previews.studioName.textContent = `❂ ${inputs.studioName.value}`;
+            previews.tagline.textContent = inputs.tagline.value;
+            previews.aboutText.innerHTML = `<span class="game-icon">➤</span> ${inputs.aboutText.value}`;
+            previews.email.textContent = inputs.email.value;
+            previews.email.href = `mailto:${inputs.email.value}`;
+            previews.contact.innerHTML = `<span class="game-icon">➤</span> Have questions or want to collaborate? Reach out to me at <a href="mailto:${inputs.email.value}">${inputs.email.value}</a>.`;
+            
+            // Update social links
+            previews.twitter.href = inputs.twitter.value;
+            previews.facebook.href = inputs.facebook.value;
+            previews.instagram.href = inputs.instagram.value;
+            previews.itchio.href = inputs.itchio.value;
+        }
+        
+        function generateExportCode() {
+            const htmlCode = `<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>${inputs.studioName.value}</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+            color: #e0e0ff;
+            min-height: 100vh;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 30px;
+            background: rgba(16, 18, 27, 0.8);
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            position: relative;
+            padding-bottom: 20px;
+        }
+        
+        .header::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 150px;
+            height: 3px;
+            background: linear-gradient(90deg, transparent, #6a5af9, transparent);
+        }
+        
+        h1 {
+            font-size: 3.5rem;
+            background: linear-gradient(90deg, #6a5af9, #d66efd);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            margin-bottom: 10px;
+            text-shadow: 0 0 20px rgba(106, 90, 249, 0.3);
+            letter-spacing: 1px;
+        }
+        
+        .tagline {
+            font-size: 1.2rem;
+            color: #a0a0ff;
+            margin-top: 10px;
+        }
+        
+        .section {
+            margin: 40px 0;
+            padding: 25px;
+            background: rgba(30, 33, 58, 0.6);
+            border-radius: 15px;
+            border-left: 4px solid #6a5af9;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        
+        .section:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+        }
+        
+        h2 {
+            font-size: 1.8rem;
+            color: #6a5af9;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+        }
+        
+        h2 i {
+            margin-right: 10px;
+            font-size: 1.5rem;
+        }
+        
+        h4 {
+            font-size: 1.1rem;
+            font-weight: 400;
+            color: #d0d0ff;
+            line-height: 1.7;
+        }
+        
+        a {
+            color: #d66efd;
+            text-decoration: none;
+            transition: color 0.3s ease;
+            font-weight: 500;
+        }
+        
+        a:hover {
+            color: #ff9ff3;
+            text-decoration: underline;
+        }
+        
+        .social-links {
+            display: flex;
+            gap: 15px;
+            margin-top: 15px;
+            flex-wrap: wrap;
+        }
+        
+        .social-link {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 15px;
+            background: rgba(106, 90, 249, 0.2);
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+        
+        .social-link:hover {
+            background: rgba(106, 90, 249, 0.4);
+            transform: translateY(-3px);
+        }
+        
+        .note {
+            margin-top: 20px;
+            padding: 15px;
+            background: rgba(255, 107, 107, 0.1);
+            border-radius: 10px;
+            border-left: 4px solid #ff6b6b;
+            font-style: italic;
+            color: #ffb8b8;
+        }
+        
+        .divider {
+            height: 2px;
+            background: linear-gradient(90deg, transparent, rgba(106, 90, 249, 0.5), transparent);
+            margin: 30px 0;
+        }
+        
+        .game-icon {
+            display: inline-block;
+            margin-right: 10px;
+            font-size: 1.2rem;
+            color: #6a5af9;
+        }
+        
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2.5rem;
+            }
+            
+            .container {
+                padding: 20px;
+            }
+            
+            .section {
+                padding: 20px;
+            }
+        }
+        
+        .pulse {
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% {
+                box-shadow: 0 0 0 0 rgba(106, 90, 249, 0.4);
+            }
+            70% {
+                box-shadow: 0 0 0 10px rgba(106, 90, 249, 0);
+            }
+            100% {
+                box-shadow: 0 0 0 0 rgba(106, 90, 249, 0);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>❂ ${inputs.studioName.value}</h1>
+            <p class="tagline">${inputs.tagline.value}</p>
+        </div>
+        
+        <div class="section pulse">
+            <h2><i class="fas fa-user-astronaut"></i> About Me</h2>
+            <h4>
+                <span class="game-icon">➤</span> ${inputs.aboutText.value}
+            </h4>
+        </div>
+        
+        <div class="divider"></div>
+        
+        <div class="section">
+            <h2><i class="fas fa-envelope"></i> Contact Me</h2>
+            <h4>
+                <span class="game-icon">➤</span> Have questions or want to collaborate? Reach out to me at 
+                <a href="mailto:${inputs.email.value}">${inputs.email.value}</a>.
+            </h4>
+        </div>
+        
+        <div class="section">
+            <h2><i class="fas fa-share-alt"></i> Follow Me</h2>
+            <h4><span class="game-icon">➤</span> Connect with me on social media:</h4>
+            <div class="social-links">
+                <a href="${inputs.twitter.value}" class="social-link">
+                    <i class="fab fa-twitter"></i> Twitter
+                </a>
+                <a href="${inputs.facebook.value}" class="social-link">
+                    <i class="fab fa-facebook"></i> Facebook
+                </a>
+                <a href="${inputs.instagram.value}" class="social-link">
+                    <i class="fab fa-instagram"></i> Instagram
+                </a>
+                <a href="${inputs.itchio.value}" class="social-link">
+                    <i class="fab fa-itch-io"></i> itch.io
+                </a>
+            </div>
+            <div class="note">
+                <i class="fas fa-exclamation-circle"></i> Note: Social media links are currently placeholders
+            </div>
+        </div>
+    </div>
+</body>
+</html>`;
+            
+            exportCode.value = htmlCode;
+            exportModal.style.display = 'flex';
+        }
+        
+        function copyToClipboard() {
+            exportCode.select();
+            document.execCommand('copy');
+            copyBtn.textContent = 'Copied!';
+            setTimeout(() => {
+                copyBtn.textContent = 'Copy to Clipboard';
+            }, 2000);
+        }
+        
+        function resetToDefault() {
+            if (confirm('Are you sure you want to reset all content to default?')) {
+                inputs.studioName.value = 'QuantumBlazeGames Studio';
+                inputs.tagline.value = 'Crafting Next-Generation Gaming Experiences';
+                inputs.aboutText.value = 'Welcome to my itch.io profile! I\'m Shiva Kar, also known as QuantumBlaze. I\'ve recently embarked on an exciting journey into game development with Unreal Engine 5. I\'m passionate about creating immersive worlds and engaging gameplay experiences. Stay tuned for more awesome games coming in the future! Explore my work and feel free to get in touch.';
+                inputs.email.value = 'shivakaryt@gmail.com';
+                inputs.twitter.value = '#';
+                inputs.facebook.value = '#';
+                inputs.instagram.value = '#';
+                inputs.itchio.value = 'https://cosmic-games-studio.itch.io/';
+                
+                updatePreview();
+            }
+        }
+    </script>
+</body>
+</html>
